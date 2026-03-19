@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IBM CDC Databricks ETL Pipeline</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #1a1a1a; display: flex; justify-content: center; padding: 2rem 1rem; }
+    .card { background: #fff; border-radius: 16px; border: 0.5px solid rgba(0,0,0,0.1); padding: 2rem; max-width: 780px; width: 100%; }
+    h1 { font-size: 16px; font-weight: 500; margin-bottom: 0.25rem; }
+    p  { font-size: 13px; color: #666; margin-bottom: 1.5rem; }
+
+    /* SVG pre-built classes */
+    svg { width: 100%; }
+    .t  { font-family: inherit; font-size: 14px; font-weight: 400; fill: #1a1a1a; }
+    .ts { font-family: inherit; font-size: 12px; font-weight: 400; fill: #666; }
+    .th { font-family: inherit; font-size: 14px; font-weight: 500; fill: #1a1a1a; }
+    .arr { fill: none; stroke: rgba(0,0,0,0.3); stroke-width: 1.5; }
+    .leader { fill: none; stroke: rgba(0,0,0,0.2); stroke-width: 0.5; stroke-dasharray: 4 3; }
+    .node { cursor: pointer; }
+
+    /* c-blue */
+    .c-blue rect, .c-blue circle, .c-blue ellipse { fill: #E6F1FB; stroke: #185FA5; }
+    .c-blue .th { fill: #0C447C; }
+    .c-blue .ts { fill: #185FA5; }
+
+    /* c-amber */
+    .c-amber rect, .c-amber circle, .c-amber ellipse { fill: #FAEEDA; stroke: #854F0B; }
+    .c-amber .th { fill: #633806; }
+    .c-amber .ts { fill: #854F0B; }
+
+    /* c-teal */
+    .c-teal rect, .c-teal circle, .c-teal ellipse { fill: #E1F5EE; stroke: #0F6E56; }
+    .c-teal .th { fill: #085041; }
+    .c-teal .ts { fill: #0F6E56; }
+
+    /* c-gray */
+    .c-gray rect, .c-gray circle, .c-gray ellipse { fill: #F1EFE8; stroke: #5F5E5A; }
+    .c-gray .th { fill: #2C2C2A; }
+    .c-gray .ts { fill: #5F5E5A; }
+
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a1a; color: #e0ddd6; }
+      .card { background: #232320; border-color: rgba(255,255,255,0.1); }
+      .t  { fill: #e0ddd6; }
+      .ts { fill: #9c9a92; }
+      .th { fill: #e0ddd6; }
+      .arr { stroke: rgba(255,255,255,0.25); }
+      .leader { stroke: rgba(255,255,255,0.15); }
+      .c-blue rect, .c-blue circle, .c-blue ellipse { fill: #0C447C; stroke: #85B7EB; }
+      .c-blue .th { fill: #B5D4F4; } .c-blue .ts { fill: #85B7EB; }
+      .c-amber rect, .c-amber circle, .c-amber ellipse { fill: #633806; stroke: #EF9F27; }
+      .c-amber .th { fill: #FAC775; } .c-amber .ts { fill: #EF9F27; }
+      .c-teal rect, .c-teal circle, .c-teal ellipse { fill: #085041; stroke: #5DCAA5; }
+      .c-teal .th { fill: #9FE1CB; } .c-teal .ts { fill: #5DCAA5; }
+      .c-gray rect, .c-gray circle, .c-gray ellipse { fill: #2C2C2A; stroke: #888780; }
+      .c-gray .th { fill: #D3D1C7; } .c-gray .ts { fill: #888780; }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>IBM CDC Databricks ETL pipeline</h1>
+  <p>Bronze → Silver medallion architecture · IBM - CDC.ipynb · Delta Lake</p>
+
+  <svg viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+
+    <!-- IBM Stock API -->
+    <g class="node c-blue">
+      <rect x="220" y="24" width="240" height="44" rx="8" stroke-width="0.5"/>
+      <text class="th" x="340" y="41" text-anchor="middle" dominant-baseline="central">IBM stock API</text>
+      <text class="ts" x="340" y="58" text-anchor="middle" dominant-baseline="central">JSON · daily OHLCV data</text>
+    </g>
+
+    <!-- Arrow: API → Bronze -->
+    <line x1="340" y1="68" x2="340" y2="112" class="arr" marker-end="url(#arrow)"/>
+
+    <!-- Bronze container -->
+    <g class="c-amber">
+      <rect x="60" y="112" width="560" height="160" rx="14" stroke-width="0.5"/>
+      <text class="th" x="88" y="138" dominant-baseline="central">Bronze layer</text>
+      <text class="ts" x="88" y="156" dominant-baseline="central">workspace.bronze.ibm · append-only · Delta</text>
+    </g>
+
+    <!-- Bronze: Watermark check -->
+    <g class="node c-amber">
+      <rect x="88" y="172" width="190" height="80" rx="8" stroke-width="0.5"/>
+      <text class="th" x="183" y="198" text-anchor="middle" dominant-baseline="central">Watermark check</text>
+      <text class="ts" x="183" y="216" text-anchor="middle" dominant-baseline="central">MAX(Date) in bronze</text>
+      <text class="ts" x="183" y="232" text-anchor="middle" dominant-baseline="central">skip already-seen rows</text>
+    </g>
+
+    <!-- Bronze: Append new records -->
+    <g class="node c-amber">
+      <rect x="402" y="172" width="190" height="80" rx="8" stroke-width="0.5"/>
+      <text class="th" x="497" y="198" text-anchor="middle" dominant-baseline="central">Append new records</text>
+      <text class="ts" x="497" y="216" text-anchor="middle" dominant-baseline="central">JSON → tabular</text>
+      <text class="ts" x="497" y="232" text-anchor="middle" dominant-baseline="central">full history retained</text>
+    </g>
+
+    <!-- Arrow inside Bronze -->
+    <line x1="278" y1="212" x2="400" y2="212" class="arr" marker-end="url(#arrow)"/>
+    <text class="ts" x="339" y="204" text-anchor="middle">new dates only</text>
+
+    <!-- Arrow: Bronze → Silver -->
+    <line x1="340" y1="272" x2="340" y2="316" class="arr" marker-end="url(#arrow)"/>
+    <text class="ts" x="390" y="298" text-anchor="start">reads bronze</text>
+
+    <!-- Silver container -->
+    <g class="c-teal">
+      <rect x="60" y="316" width="560" height="160" rx="14" stroke-width="0.5"/>
+      <text class="th" x="88" y="342" dominant-baseline="central">Silver layer</text>
+      <text class="ts" x="88" y="360" dominant-baseline="central">workspace.silver.ibm · latest-per-Date · Delta</text>
+    </g>
+
+    <!-- Silver: Clean & validate -->
+    <g class="node c-teal">
+      <rect x="88" y="376" width="190" height="80" rx="8" stroke-width="0.5"/>
+      <text class="th" x="183" y="402" text-anchor="middle" dominant-baseline="central">Clean &amp; validate</text>
+      <text class="ts" x="183" y="420" text-anchor="middle" dominant-baseline="central">cast types · drop nulls</text>
+      <text class="ts" x="183" y="436" text-anchor="middle" dominant-baseline="central">de-duplicate on Date</text>
+    </g>
+
+    <!-- Silver: Delta MERGE -->
+    <g class="node c-teal">
+      <rect x="402" y="376" width="190" height="80" rx="8" stroke-width="0.5"/>
+      <text class="th" x="497" y="402" text-anchor="middle" dominant-baseline="central">Delta MERGE</text>
+      <text class="ts" x="497" y="420" text-anchor="middle" dominant-baseline="central">key: Date</text>
+      <text class="ts" x="497" y="436" text-anchor="middle" dominant-baseline="central">insert new · update existing</text>
+    </g>
+
+    <!-- Arrow inside Silver -->
+    <line x1="278" y1="416" x2="400" y2="416" class="arr" marker-end="url(#arrow)"/>
+    <text class="ts" x="339" y="408" text-anchor="middle">curated rows</text>
+
+    <!-- Libraries callout -->
+    <line class="leader" x1="620" y1="212" x2="648" y2="136"/>
+    <text class="ts" x="650" y="130" dominant-baseline="central">requests</text>
+    <text class="ts" x="650" y="146" dominant-baseline="central">pandas · numpy</text>
+    <text class="ts" x="650" y="162" dominant-baseline="central">pyspark · delta</text>
+  </svg>
+</div>
+</body>
+</html>
