@@ -1,0 +1,29 @@
+resources:
+  jobs:
+    IBM_ETL:
+      name: IBM_ETL
+      email_notifications:
+        on_success:
+          - rana@ghazzi.com
+        on_failure:
+          - rana@ghazzi.com
+      tasks:
+        - task_key: API-Ingestion
+          notebook_task:
+            notebook_path: ../notebook/IBM_landing.ipynb
+            source: WORKSPACE
+        - task_key: Auto_Loader_bronze
+          depends_on:
+            - task_key: API-Ingestion
+          notebook_task:
+            notebook_path: ../notebooks/IBM_autoLoader_bronze.ipynb
+            source: WORKSPACE
+        - task_key: Silver_Merge
+          depends_on:
+            - task_key: Auto_Loader_bronze
+          notebook_task:
+            notebook_path: ../notebooks/IBM _silver.ipynb
+            source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
