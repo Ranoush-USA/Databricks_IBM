@@ -10,7 +10,7 @@ resources:
       tasks:
         - task_key: API-Ingestion
           notebook_task:
-            notebook_path: ../notebook/IBM_landing.ipynb
+            notebook_path: ../notebooks/IBM_landing.ipynb
             source: WORKSPACE
         - task_key: Auto_Loader_bronze
           depends_on:
