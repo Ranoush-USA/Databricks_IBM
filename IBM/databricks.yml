@@ -1,0 +1,45 @@
+# Declarative Automation Bundle configuration, more info here: https://docs.databricks.com/en/dev-tools/bundles/settings.html
+bundle:
+  name: "IBM"
+
+include:
+  - resources/jobs/*.yml
+  - resources/pipelines/*.yml
+  - resources/notebooks/*.ipynb 
+variables:
+  catalog:
+    description: workspace catalog name
+    default: workspace
+  bronze_schema:
+    description: Schema for raw ingested data
+    default: bronze
+  silver_schema:
+    description: Schema for cleaned validated data
+    default: silver
+  gold_schema:
+    description: Schema for business ready aggregations
+    default: gold
+  quarantine_schema:
+    description: Schema for failed quality check records
+    default: quarantine
+targets:
+  # The 'dev' target, for development purposes. This target is the default.
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-c96a283d-ad26.cloud.databricks.com
+
+  # The 'prod' target, used for production deployment.
+  prod:
+    mode: production
+    default: false
+    workspace:
+      host: https://dbc-c96a283d-ad26.cloud.databricks.com
+
+    
+    run_as:
+      user_name: rana@ghazzi.com
+    permissions:
+      - user_name: rana@ghazzi.com
+        level: CAN_MANAGE
