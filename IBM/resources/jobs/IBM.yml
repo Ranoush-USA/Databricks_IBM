@@ -10,19 +10,19 @@ resources:
       tasks:
         - task_key: API-Ingestion
           notebook_task:
-            notebook_path: ../notebooks/IBM_landing.ipynb
+            notebook_path: /Workspace/Users/rana@ghazzi.com/Dev/Databricks_IBM/IBM/resources/notebooks/IBM_landing.ipynb
             source: WORKSPACE
         - task_key: Auto_Loader_bronze
           depends_on:
             - task_key: API-Ingestion
           notebook_task:
-            notebook_path: ../notebooks/IBM_autoLoader_bronze.ipynb
+            notebook_path: /Workspace/Users/rana@ghazzi.com/Dev/Databricks_IBM/IBM/resources/notebooks/IBM_autoLoader_bronze.ipynb
             source: WORKSPACE
         - task_key: Silver_Merge
           depends_on:
             - task_key: Auto_Loader_bronze
           notebook_task:
-            notebook_path: ../notebooks/IBM _silver.ipynb
+            notebook_path: /Workspace/Users/rana@ghazzi.com/Dev/Databricks_IBM/IBM/resources/notebooks/IBM_silver.ipynb
             source: WORKSPACE
       queue:
         enabled: true
