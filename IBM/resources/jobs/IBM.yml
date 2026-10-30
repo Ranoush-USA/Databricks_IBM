@@ -1,12 +1,13 @@
 resources:
   jobs:
-    IBM:
-      name: IBM
+    dev_rana_IBM:
+      name: "[dev rana] IBM"
       email_notifications:
         on_success:
           - rana@ghazzi.com
         on_failure:
           - rana@ghazzi.com
+      max_concurrent_runs: 4
       tasks:
         - task_key: API-Ingestion
           notebook_task:
@@ -24,6 +25,8 @@ resources:
           notebook_task:
             notebook_path: ../notebooks/IBM_silver.ipynb
             source: WORKSPACE
+      tags:
+        dev: rana
       queue:
-        enabled: true
+        enabled: false
       performance_target: PERFORMANCE_OPTIMIZED
